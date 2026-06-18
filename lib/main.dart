@@ -93,7 +93,6 @@ pause''';
     });
   }
 
-  // Ouvre le script dans une nouvelle fenêtre (Route) de l'application
   void _navigateToBatScript() async {
     final logMessage = await Navigator.push<String>(
       context,
@@ -210,7 +209,7 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("[*] BX Remote [*]", style: TextStyle(fontSize: 18, letterSpacing: 1)),
+        title: const Text("[-] BX Remote [-]", style: TextStyle(fontSize: 18, letterSpacing: 1)),
         backgroundColor: const Color(0xFF000000),
         elevation: 0,
         actions: [
@@ -230,6 +229,7 @@ pause''';
                   flex: 3,
                   child: TextField(
                     controller: _ipController,
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                     decoration: _customInputStyle("Adresse IP cible"),
                   ),
                 ),
@@ -259,8 +259,8 @@ pause''';
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      width: 130,
-                      height: 130,
+                      width: 140,
+                      height: 140,
                       child: _isLoading
                           ? const CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF0000)),
@@ -278,8 +278,8 @@ pause''';
                     ),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      width: 110,
-                      height: 110,
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
                         color: _isConnected ? const Color(0xFF000000) : const Color(0xFFFF0000),
                         shape: BoxShape.circle,
@@ -292,7 +292,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 40,
+                          size: 105,
                         ),
                       ),
                     ),
@@ -330,7 +330,7 @@ pause''';
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                     ),
                     onPressed: _handleCommandExecution,
-                    child: const Icon(Icons.arrow_forward, size: 16),
+                    child: const Icon(Icons.arrow_forward, size: 19),
                   ),
                 ),
               ],
@@ -390,7 +390,6 @@ pause''';
   }
 }
 
-// Nouvelle fenêtre complète pour l'affichage, l'édition et la copie du script .bat
 class BatScriptScreen extends StatefulWidget {
   final String scriptContent;
   const BatScriptScreen({super.key, required this.scriptContent});
@@ -434,8 +433,8 @@ class _BatScriptScreenState extends State<BatScriptScreen> {
             Expanded(
               child: TextField(
                 controller: _scriptController,
-                maxLines: null, // Permet un nombre infini de lignes
-                expands: true,  // Remplit tout l'espace de la fenêtre
+                maxLines: null,
+                expands: true,
                 textAlignVertical: TextAlignVertical.top,
                 style: const TextStyle(color: Colors.white70, fontFamily: "monospace", fontSize: 12),
                 decoration: InputDecoration(
