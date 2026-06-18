@@ -219,7 +219,7 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("[-] BX Remote [-]", style: TextStyle(fontSize: 18, letterSpacing: 1)),
+        title: const Text("BX Remote", style: TextStyle(fontSize: 18, letterSpacing: 1)),
         backgroundColor: const Color(0xFF000000),
         elevation: 0,
         actions: [
