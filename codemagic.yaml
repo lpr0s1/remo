@@ -14,7 +14,7 @@ workflows:
     scripts:
       - name: Generer l environnement iOS
         script: |
-          flutter create --org com.bxremote . --platforms=ios
+          flutter create . --platforms=ios
       - name: Recuperer les dependances Pub
         script: |
           flutter pub get
