@@ -21,5 +21,11 @@ workflows:
       - name: Compiler pour iOS
         script: |
           flutter build ios --no-codesign
+      - name: Packager en IPA non signe
+        script: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r remote_control.ipa Payload
     artifacts:
-      - build/ios/iphoneos/*.app
+      - build/ios/iphoneos/*.ipa
