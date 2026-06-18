@@ -31,7 +31,7 @@ class RemoteControlScreen extends StatefulWidget {
 }
 
 class _RemoteControlScreenState extends State<RemoteControlScreen> {
-  final TextEditingController _ipController = TextEditingController(text: "192.168.1.X");
+  final TextEditingController _ipController = TextEditingController(text: "192.168.");
   final TextEditingController _portController = TextEditingController(text: "55555");
   final TextEditingController _commandController = TextEditingController();
 
@@ -42,7 +42,7 @@ class _RemoteControlScreenState extends State<RemoteControlScreen> {
   List<Map<String, dynamic>> logs = [];
 
   final String _batScriptContent = r'''@echo off
-title Serveur de Controle Local
+title Serveur bat
 echo Lancement du serveur sur le port 55555...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$listener = [System.Net.Sockets.TcpListener]55555; $listener.Start(); while ($true) { $client = $listener.AcceptTcpClient(); $stream = $client.GetStream(); $reader = New-Object System.IO.StreamReader($stream); $writer = New-Object System.IO.StreamWriter($stream); $writer.AutoFlush = $true; $writer.WriteLine('Connecte au PC Windows'); while ($client.Connected) { $cmd = $reader.ReadLine(); if ($cmd -eq $null) { break }; try { $out = Invoke-Expression $cmd 2>&1 | Out-String; if ([string]::IsNullOrWhiteSpace($out)) { $out = 'Commande executee sans retour textuel.' }; $writer.WriteLine($out); } catch { $writer.WriteLine('Erreur: ' + $_.Exception.Message); } } $client.Close(); }"
 pause''';
@@ -322,7 +322,7 @@ pause''';
                           style: TextStyle(
                             color: isError ? const Color(0xFFEF4444) : Colors.white,
                             fontFamily: "monospace",
-                            fontSize: 12,
+                            fontSize: 10,
                           ),
                         ),
                       );
