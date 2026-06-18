@@ -93,66 +93,18 @@ pause''';
     });
   }
 
-  // Nouvelle méthode pour afficher le Popup d'édition et de copie
-  void _showBatScriptDialog() {
-    final TextEditingController dialogTextController = TextEditingController(text: _batScriptContent);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF0A0A0A),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: Color(0xFFFF0000), width: 1.5),
-          ),
-          title: const Text(
-            "script de configuration .bat",
-            style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "monospace"),
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: TextField(
-              controller: dialogTextController,
-              maxLines: 15,
-              style: const TextStyle(color: Colors.white70, fontFamily: "monospace", fontSize: 11),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF000000),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: const BorderSide(color: Colors.white10),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: const BorderSide(color: Color(0xFFFF0000)),
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("annuler", style: TextStyle(color: Colors.white24, fontSize: 13)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF0000),
-                foregroundColor: Colors.black,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              ),
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: dialogTextController.text));
-                Navigator.pop(context);
-                _addLog("script .bat personnalisé copié.");
-              },
-              child: const Text("copier", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-            ),
-          ],
-        );
-      },
+  // Ouvre le script dans une nouvelle fenêtre (Route) de l'application
+  void _navigateToBatScript() async {
+    final logMessage = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BatScriptScreen(scriptContent: _batScriptContent),
+      ),
     );
+    
+    if (logMessage != null) {
+      _addLog(logMessage);
+    }
   }
 
   void _toggleConnection() async {
@@ -263,7 +215,7 @@ pause''';
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: _showBatScriptDialog, // Appelle le nouveau popup ici
+            onPressed: _navigateToBatScript,
             child: const Text("copier le .bat", style: TextStyle(color: Color(0xFFFF0000), fontSize: 13)),
           )
         ],
@@ -340,7 +292,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 40, // Légère correction de la taille pour s'aligner dans la zone circulaire
+                          size: 40,
                         ),
                       ),
                     ),
@@ -431,6 +383,93 @@ pause''';
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Nouvelle fenêtre complète pour l'affichage, l'édition et la copie du script .bat
+class BatScriptScreen extends StatefulWidget {
+  final String scriptContent;
+  const BatScriptScreen({super.key, required this.scriptContent});
+
+  @override
+  State<BatScriptScreen> createState() => _BatScriptScreenState();
+}
+
+class _BatScriptScreenState extends State<BatScriptScreen> {
+  late TextEditingController _scriptController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scriptController = TextEditingController(text: widget.scriptContent);
+  }
+
+  @override
+  void dispose() {
+    _scriptController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF000000),
+      appBar: AppBar(
+        title: const Text("configuration script .bat", style: TextStyle(fontSize: 14, fontFamily: "monospace")),
+        backgroundColor: const Color(0xFF000000),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFFFF0000)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _scriptController,
+                maxLines: null, // Permet un nombre infini de lignes
+                expands: true,  // Remplit tout l'espace de la fenêtre
+                textAlignVertical: TextAlignVertical.top,
+                style: const TextStyle(color: Colors.white70, fontFamily: "monospace", fontSize: 12),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF050505),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    borderSide: const BorderSide(color: Colors.white10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    borderSide: const BorderSide(color: Color(0xFFFF0000)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF0000),
+                  foregroundColor: Colors.black,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: _scriptController.text));
+                  Navigator.pop(context, "script .bat personnalisé copié.");
+                },
+                child: const Text("copier le script", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              ),
+            ),
           ],
         ),
       ),
