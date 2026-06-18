@@ -263,7 +263,7 @@ pause''';
                 icon: const Icon(Icons.help_outline, color: Color(0xFFFF0000), size: 15),
                 label: const Text(
                   "comment se connecter ?",
-                  style: TextStyle(color: Color(0xFFFF0000), fontSize: 12, decoration: TextDecoration.underline),
+                  style: TextStyle(color: Color(0xFFFF0000), fontSize: 12),
                 ),
               ),
             ),
