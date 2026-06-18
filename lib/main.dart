@@ -58,7 +58,7 @@ pause''';
 
   void _copyBatScript() {
     Clipboard.setData(ClipboardData(text: _batScriptContent));
-    _addLog("Script .bat copie ! Cree un fichier script.bat sur ton PC et colle le contenu.");
+    _addLog("Script .bat copier ! Cree un fichier script.bat avec le contenu coller dedans et envoi le sur ton pc.");
   }
 
   void _toggleConnection() async {
