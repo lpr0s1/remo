@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0A0A0E),
+        scaffoldBackgroundColor: const Color(0xFF0D0E12),
         primaryColor: const Color(0xFF3B82F6),
       ),
       home: const RemoteControlScreen(),
@@ -31,9 +31,10 @@ class RemoteControlScreen extends StatefulWidget {
 }
 
 class _RemoteControlScreenState extends State<RemoteControlScreen> with SingleTickerProviderStateMixin {
-  final TextEditingController _ipController = TextEditingController(text: "192.168.");
+  final TextEditingController _ipController = TextEditingController(text: "192.168.1.1");
   final TextEditingController _portController = TextEditingController(text: "55555");
   final TextEditingController _commandController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   Socket? _socket;
   bool _isLoading = false;
@@ -41,22 +42,25 @@ class _RemoteControlScreenState extends State<RemoteControlScreen> with SingleTi
   bool _showLogs = true;
   List<Map<String, dynamic>> logs = [];
 
-  // Controleurs d animation pour l effet de clic (zoom/pression)
+  // Contrôleur pour l'animation du bouton
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
   final String _batScriptContent = r'''@echo off
-title Serveur de Controle Local
-echo Lancement du serveur local sur le port 55555...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$listener = [System.Net.Sockets.TcpListener]55555; $listener.Start(); while ($true) { $client = $listener.AcceptTcpClient(); $stream = $client.GetStream(); $reader = New-Object System.IO.StreamReader($stream); $writer = New-Object System.IO.StreamWriter($stream); $writer.AutoFlush = $true; $writer.WriteLine('Connecte au PC Windows'); while ($client.Connected) { $cmd = $reader.ReadLine(); if ($cmd -eq $null) { break }; try { $out = Invoke-Expression $cmd 2>&1 | Out-String; if ([string]::IsNullOrWhiteSpace($out)) { $out = 'Commande executee sans retour textuel.' }; $writer.WriteLine($out); } catch { $writer.WriteLine('Erreur: ' + $_.Exception.Message); } } $client.Close(); }"
+title Serveur local
+echo Lancement du serveur sur le port 55555...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$listener = [System.Net.Sockets.TcpListener]55555; $listener.Start(); while ($true) { $client = $listener.AcceptTcpClient(); $stream = $client.GetStream(); $reader = New-Object System.IO.StreamReader($stream); $writer = New-Object System.IO.StreamWriter($stream); $writer.AutoFlush = $true; $writer.WriteLine('Connecté au PC Windows'); while ($client.Connected) { $cmd = $reader.ReadLine(); if ($cmd -eq $null) { break }; try { $out = Invoke-Expression $cmd 2>&1 | Out-String; if ([string]::IsNullOrWhiteSpace($out)) { $out = 'Commande exécutée sans retour textuel.' }; $writer.WriteLine($out); } catch { $writer.WriteLine('Erreur: ' + $_.Exception.Message); } } $client.Close(); }"
 pause''';
+
+  @override
+  void train() {}
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 150),
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
@@ -69,21 +73,34 @@ pause''';
     _ipController.dispose();
     _portController.dispose();
     _commandController.dispose();
+    _scrollController.dispose();
+    _socket?.destroy();
     super.dispose();
   }
 
   void _addLog(String message, {bool isError = false}) {
+    if (!mounted) return;
     setState(() {
       logs.add({
         "text": "[${DateTime.now().toString().substring(11, 19)}] $message",
         "isError": isError
       });
     });
+    // Auto-scroll vers le bas
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void _copyBatScript() {
     Clipboard.setData(ClipboardData(text: _batScriptContent));
-    _addLog("Script .bat copie dans le presse-papiers.");
+    _addLog("Script .bat copié dans le presse-papiers.");
   }
 
   void _toggleConnection() async {
@@ -95,15 +112,15 @@ pause''';
     final ip = _ipController.text.trim();
     final port = int.tryParse(_portController.text.trim());
 
-    if (ip.isEmpty || port == null) {
-      _addLog("Erreur : Adresse IP ou Port invalide", isError: true);
+    if (ip.isEmpty || port == null || port < 1 || port > 65535) {
+      _addLog("Erreur : configuration IP ou port invalide", isError: true);
       return;
     }
 
     setState(() {
       _isLoading = true;
     });
-    _addLog("Tentative de connexion a $ip:$port ...");
+    _addLog("Tentative de connexion à $ip:$port...");
 
     try {
       _socket = await Socket.connect(ip, port, timeout: const Duration(seconds: 5));
@@ -112,19 +129,19 @@ pause''';
         _isConnected = true;
         _isLoading = false;
       });
-      _addLog("Connexion etablie avec succes");
+      _addLog("Connexion établie avec succès");
 
       _socket!.listen(
         (List<int> data) {
           final response = utf8.decode(data).trim();
-          _addLog("PC : $response");
+          _addLog(response);
         },
         onError: (error) {
-          _addLog("Erreur reseau : $error", isError: true);
+          _addLog("Erreur réseau : $error", isError: true);
           _disconnect();
         },
         onDone: () {
-          _addLog("Le PC a ferme la connexion");
+          _addLog("La cible a fermé la connexion");
           _disconnect();
         },
       );
@@ -133,7 +150,7 @@ pause''';
         _isLoading = false;
         _isConnected = false;
       });
-      _addLog("Echec de la connexion : $e", isError: true);
+      _addLog("Échec de la connexion : l'hôte est introuvable ou le port est fermé ($e)", isError: true);
     }
   }
 
@@ -146,54 +163,40 @@ pause''';
       _isConnected = false;
       _isLoading = false;
     });
-    _addLog("Deconnecte de l appareil");
+    _addLog("Déconnecté de l'appareil");
   }
 
-  void _handleCommandExecution() async {
+  void _handleCommandExecution() {
     final input = _commandController.text.trim();
     if (input.isEmpty) return;
 
     _commandController.clear();
 
-    if (input.startsWith("http://") || input.startsWith("https://")) {
-      _addLog("Execution requete HTTP directe...");
-      try {
-        final client = HttpClient();
-        final request = await client.getUrl(Uri.parse(input)).timeout(const Duration(seconds: 5));
-        final response = await request.close();
-        final responseBody = await response.transform(utf8.decoder).join();
-        
-        _addLog("HTTP Status : ${response.statusCode}");
-        _addLog("Reponse HTTP : ${responseBody.length > 150 ? responseBody.substring(0, 150) + '...' : responseBody}");
-      } catch (e) {
-        _addLog("Erreur execution HTTP : $e", isError: true);
-      }
-    } else {
-      if (_socket == null) {
-        _addLog("Erreur : Aucun appareil connecte via TCP", isError: true);
-        return;
-      }
-      try {
-        _socket!.write(input + "\n");
-        _addLog("Terminal > $input");
-      } catch (e) {
-        _addLog("Erreur d envoi : $e", isError: true);
-      }
+    if (_socket == null) {
+      _addLog("Erreur : aucun appareil connecté", isError: true);
+      return;
+    }
+    try {
+      _socket!.write("$input\n");
+      _addLog("Terminal > $input");
+    } catch (e) {
+      _addLog("Erreur lors de l'envoi : $e", isError: true);
     }
   }
 
-  InputDecoration _customInputStyle(String label) {
+  InputDecoration _customInputStyle(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
+      prefixIcon: Icon(icon, size: 18, color: Colors.white38),
       labelStyle: const TextStyle(color: Colors.white38, fontSize: 13),
       filled: true,
-      fillColor: const Color(0xFF14141B),
+      fillColor: const Color(0xFF16171F),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.white10),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5),
       ),
     );
@@ -203,16 +206,14 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("REMOTE CONSOLE", style: TextStyle(letterSpacing: 1.5, fontSize: 15, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF14141B),
+        title: const Text("Console de contrôle", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w640)),
+        backgroundColor: const Color(0xFF16171F),
         elevation: 0,
         actions: [
-          TextButton(
+          IconButton(
+            icon: const Icon(Icons.copy, size: 20, color: Colors.amberAccent),
+            tooltip: "Copier le script .bat",
             onPressed: _copyBatScript,
-            child: const Text(
-              "[ GET .BAT ]",
-              style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 12),
-            ),
           )
         ],
       ),
@@ -226,7 +227,7 @@ pause''';
                   flex: 2,
                   child: TextField(
                     controller: _ipController,
-                    decoration: _customInputStyle("ADRESSE IP"),
+                    decoration: _customInputStyle("Adresse IP cible", Icons.computer),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -235,60 +236,66 @@ pause''';
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
-                    decoration: _customInputStyle("PORT"),
+                    decoration: _customInputStyle("Port", Icons.settings_ethernet),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 40),
 
-            // Zone du bouton anime avec bague de chargement externe autonome
+            // Zone centrale avec le bouton de connexion animé
             GestureDetector(
               onTapDown: (_) => _animationController.forward(),
-              onTapUp: (_) => _animationController.reverse(),
+              onTapUp: (_) {
+                _animationController.reverse();
+                if (!_isLoading) _toggleConnection();
+              },
               onTapCancel: () => _animationController.reverse(),
-              onTap: _isLoading ? null : _toggleConnection,
               child: ScaleTransition(
                 scale: _scaleAnimation,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Anneau externe qui tourne de maniere vive uniquement pendant le chargement
-                    if (_isLoading)
-                      const SizedBox(
-                        width: 150,
-                        height: 150,
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF3B82F6),
-                          strokeWidth: 3.5,
-                        ),
-                      ),
-                    // Le bouton de connexion rond principal
+                    // Anneau de chargement ou bordure d'état
+                    SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF3B82F6)),
+                              strokeWidth: 4,
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _isConnected ? const Color(0xFF10B981) : Colors.white10,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                    ),
+                    // Bouton principal interne
                     AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      width: 120,
-                      height: 120,
+                      duration: const Duration(milliseconds: 300),
+                      width: 130,
+                      height: 130,
                       decoration: BoxDecoration(
                         color: _isConnected ? const Color(0xFF10B981) : const Color(0xFF2563EB),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: _isConnected ? const Color(0xFF10B981).withOpacity(0.3) : const Color(0xFF2563EB).withOpacity(0.3),
-                            blurRadius: 20,
-                            spreadRadius: 4,
+                            color: (_isConnected ? const Color(0xFF10B981) : const Color(0xFF2563EB)).withOpacity(0.4),
+                            blurRadius: 15,
+                            spreadRadius: 2,
                           )
                         ],
-                        border: Border.all(color: Colors.white12, width: 2),
                       ),
-                      child: const Center(
-                        child: Text(
-                          "[ < > ]",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                            letterSpacing: 1.2,
-                          ),
+                      child: Center(
+                        child: Icon(
+                          _isConnected ? Icons.power_settings_new : Icons.bolt,
+                          color: Colors.white,
+                          size: 38,
                         ),
                       ),
                     ),
@@ -296,81 +303,83 @@ pause''';
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
-              _isConnected ? "STATUS : CONNECTE" : "STATUS : DISCONNECTED",
+              _isConnected ? "Statut : connecté" : "Statut : déconnecté",
               style: TextStyle(
-                fontWeight: FontWeight.bold, 
-                fontSize: 12, 
-                letterSpacing: 1.5,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
                 color: _isConnected ? const Color(0xFF10B981) : Colors.white38,
               ),
             ),
             const SizedBox(height: 40),
 
-            // Barre de saisie des commandes
+            // Saisie des commandes
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commandController,
-                    decoration: _customInputStyle("COMMAND OR HTTP URL"),
+                    decoration: _customInputStyle("Commande à exécuter", Icons.terminal),
                     onSubmitted: (_) => _handleCommandExecution(),
                   ),
                 ),
                 const SizedBox(width: 12),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF14141B),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(color: Colors.white10),
-                    ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
                   ),
                   onPressed: _handleCommandExecution,
-                  child: const Text(
-                    "[ EXE ]",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
+                  child: const Icon(Icons.send, size: 18),
                 ),
               ],
             ),
             const SizedBox(height: 20),
             
-            TextButton(
-              onPressed: () => setState(() => _showLogs = !_showLogs),
-              child: Text(
-                _showLogs ? "[ MASQUER CONSOLE ]" : "[ AFFICHER CONSOLE ]",
-                style: const TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 1.2),
-              ),
+            // Séparateur de console
+            Row(
+              children: [
+                const Text("Console de sortie", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => setState(() => _showLogs = !_showLogs),
+                  icon: Icon(_showLogs ? Icons.visibility_off : Icons.visibility, size: 14, color: Colors.white38),
+                  label: Text(
+                    _showLogs ? "Masquer" : "Afficher",
+                    style: const TextStyle(color: Colors.white38, fontSize: 12),
+                  ),
+                ),
+              ],
             ),
 
-            // Console d evenements (Texte blanc, Erreurs rouge vif)
             if (_showLogs)
               Expanded(
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF050507),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white10, width: 1),
+                    color: const Color(0xFF07080B),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white10),
                   ),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   child: ListView.builder(
+                    controller: _scrollController,
                     itemCount: logs.length,
                     itemBuilder: (context, index) {
                       final logItem = logs[index];
                       final bool isError = logItem["isError"] ?? false;
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2.5),
+                        padding: const EdgeInsets.symmetric(vertical: 3),
                         child: Text(
                           logItem["text"] ?? "",
                           style: TextStyle(
-                            color: isError ? const Color(0xFFEF4444) : Colors.white,
+                            color: isError ? const Color(0xFFEF4444) : const Color(0xFFE2E8F0),
                             fontFamily: "monospace",
-                            fontSize: 11,
-                            fontWeight: isError ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 12,
                           ),
                         ),
                       );
