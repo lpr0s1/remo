@@ -250,8 +250,8 @@ pause''';
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      width: 150,
-                      height: 150,
+                      width: 140,
+                      height: 140,
                       child: _isLoading
                           ? const CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF0000)),
@@ -283,7 +283,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 40,
+                          size: 60,
                         ),
                       ),
                     ),
