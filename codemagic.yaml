@@ -1,10 +1,9 @@
 workflows:
-  ios-build:
-    name: iOS App Build
-    instance_type: mac_mini_m1
+  android-build:
+    name: Android App Build
+    instance_type: linux_x2
     environment:
       flutter: stable
-      xcode: latest
     triggering:
       events:
         - push
@@ -12,23 +11,17 @@ workflows:
         - pattern: '*'
           include: true
     scripts:
-      - name: Generer l environnement iOS
+      - name: Generer l environnement Android
         script: |
-          flutter create . --platforms=ios
+          flutter create . --platforms=android
       - name: Recuperer les dependances Pub
         script: |
           flutter pub get
       - name: Generer l icone de l application
         script: |
           dart run flutter_launcher_icons
-      - name: Compiler pour iOS
+      - name: Compiler pour Android (APK)
         script: |
-          flutter build ios --no-codesign
-      - name: Packager en IPA non signe
-        script: |
-          cd build/ios/iphoneos
-          mkdir Payload
-          cp -r Runner.app Payload/
-          zip -r remote_control.ipa Payload
+          flutter build apk --release
     artifacts:
-      - build/ios/iphoneos/*.ipa
+      - build/app/outputs/flutter-apk/*-release.apk
