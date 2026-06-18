@@ -29,6 +29,6 @@ workflows:
           cd build/ios/iphoneos
           mkdir Payload
           cp -r Runner.app Payload/
-          zip -r remote_control.ipa Payload
+          zip -r Bxremote.ipa Payload
     artifacts:
       - build/ios/iphoneos/*.ipa
