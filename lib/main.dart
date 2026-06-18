@@ -71,7 +71,7 @@ pause''';
     final port = int.tryParse(_portController.text.trim());
 
     if (ip.isEmpty || port == null) {
-      _addLog("Erreur : Configuration IP ou Port invalide", isError: true);
+      _addLog("Erreur : De l adresse IP ou Port invalide", isError: true);
       return;
     }
 
@@ -99,7 +99,7 @@ pause''';
           _disconnect();
         },
         onDone: () {
-          _addLog("Le PC a ferme la connexion");
+          _addLog("Le PC a fermer la connexion");
           _disconnect();
         },
       );
@@ -121,7 +121,7 @@ pause''';
       _isConnected = false;
       _isLoading = false;
     });
-    _addLog("Deconnecte de l appareil");
+    _addLog("Deconnecter de l appareil");
   }
 
   void _handleCommandExecution() async {
@@ -178,15 +178,15 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("TERMINAL INTERFACE", style: TextStyle(letterSpacing: 1.5, fontSize: 16, fontWeight: FontWeight.bold)),
+        title: const Text("REMOTE (client)", style: TextStyle(letterSpacing: 1.5, fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF14141B),
         elevation: 0,
         actions: [
           TextButton(
             onPressed: _copyBatScript,
             child: const Text(
-              "[ GET .BAT ]",
-              style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 13),
+              "Copier le .bat",
+              style: TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 12),
             ),
           )
         ],
@@ -201,37 +201,36 @@ pause''';
                   flex: 2,
                   child: TextField(
                     controller: _ipController,
-                    decoration: _customInputStyle("ADRESSE IP TARGET"),
+                    decoration: _customInputStyle("Adresse ip cible"),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 11),
                 Expanded(
                   flex: 1,
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
-                    decoration: _customInputStyle("PORT"),
+                    decoration: _customInputStyle("Un port disponible"),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 35),
+            const SizedBox(height: 36),
 
-            // Gros bouton de connexion ultra-style sans icone avec halo
             GestureDetector(
               onTap: _isLoading ? null : _toggleConnection,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                width: 125,
-                height: 125,
+                width: 145,
+                height: 145,
                 decoration: BoxDecoration(
                   color: _isConnected ? const Color(0xFF10B981) : const Color(0xFF2563EB),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: _isConnected ? const Color(0xFF10B981).withOpacity(0.35) : const Color(0xFF2563EB).withOpacity(0.35),
-                      blurRadius: 25,
-                      spreadRadius: 6,
+                      blurRadius: 4,
+                      spreadRadius: 1,
                     )
                   ],
                   border: Border.all(color: Colors.white24, width: 2),
@@ -253,53 +252,51 @@ pause''';
             ),
             const SizedBox(height: 15),
             Text(
-              _isConnected ? "STATUS : CONNECTE" : "STATUS : DISCONNECTED",
+              _isConnected ? "STATUS : Connecter 🟢" : "STATUS : Pas connecter🔴",
               style: TextStyle(
                 fontWeight: FontWeight.bold, 
-                fontSize: 12, 
+                fontSize: 15, 
                 letterSpacing: 1.2,
                 color: _isConnected ? const Color(0xFF10B981) : Colors.white38,
               ),
             ),
             const SizedBox(height: 35),
 
-            // Ligne de commande executee via bouton texte [ EXE ]
+    
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commandController,
-                    decoration: _customInputStyle("COMMAND TERMINAL OR HTTP URL"),
+                    decoration: _customInputStyle("Commandes sur l appareil"),
                     onSubmitted: (_) => _handleCommandExecution(),
                   ),
                 ),
                 const SizedBox(width: 10),
                 TextButton(
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
+                    backgroundColor: const Color(0xFFFF0000),
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: _handleCommandExecution,
                   child: const Text(
-                    "[ EXE ]",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    "=>",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
             
-            // Toggle de la console
             TextButton(
               onPressed: () => setState(() => _showLogs = !_showLogs),
               child: Text(
-                _showLogs ? "[ MASQUER CONSOLE ]" : "[ AFFICHER CONSOLE ]",
+                _showLogs ? "[ MASQUER CONSOLE  ]" : "[ AFFICHER CONSOLE ]",
                 style: const TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 1.2),
               ),
             ),
 
-            // Console d'evenements
             if (_showLogs)
               Expanded(
                 child: Container(
