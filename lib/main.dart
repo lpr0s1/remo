@@ -201,7 +201,7 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("console", style: TextStyle(fontSize: 14, letterSpacing: 1)),
+        title: const Text("[*] BX Remote [*]", style: TextStyle(fontSize: 14, letterSpacing: 1)),
         backgroundColor: const Color(0xFF000000),
         elevation: 0,
         actions: [
@@ -221,7 +221,7 @@ pause''';
                   flex: 3,
                   child: TextField(
                     controller: _ipController,
-                    decoration: _customInputStyle("adresse ip"),
+                    decoration: _customInputStyle("Adresse IP cible"),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -230,14 +230,13 @@ pause''';
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
-                    decoration: _customInputStyle("port"),
+                    decoration: _customInputStyle("Port cible"),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 40),
 
-            // Bouton central minimaliste rouge et noir
             GestureDetector(
               onTapDown: (_) => _animationController.forward(),
               onTapUp: (_) {
@@ -251,8 +250,8 @@ pause''';
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                      width: 120,
-                      height: 120,
+                      width: 150,
+                      height: 150,
                       child: _isLoading
                           ? const CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF0000)),
@@ -294,9 +293,9 @@ pause''';
             ),
             const SizedBox(height: 12),
             Text(
-              _isConnected ? "statut : connecté" : "statut : déconnecté",
+              _isConnected ? "status : Connecter" : "statut : Deconnecter",
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 15,
                 color: _isConnected ? const Color(0xFFFF0000) : Colors.white24,
               ),
             ),
@@ -307,7 +306,7 @@ pause''';
                 Expanded(
                   child: TextField(
                     controller: _commandController,
-                    decoration: _customInputStyle("commande"),
+                    decoration: _customInputStyle("commandes a distance"),
                     onSubmitted: (_) => _handleCommandExecution(),
                   ),
                 ),
@@ -331,7 +330,7 @@ pause''';
             
             Row(
               children: [
-                const Text("logs", style: TextStyle(color: Colors.white24, fontSize: 11)),
+                const Text("logs", style: TextStyle(color: Colors.white22, fontSize: 13)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => setState(() => _showLogs = !_showLogs),
