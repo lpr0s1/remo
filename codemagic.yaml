@@ -1,0 +1,25 @@
+workflows:
+  ios-build:
+    name: iOS App Build
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      xcode: latest
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+    scripts:
+      - name: Generer l environnement iOS
+        script: |
+          flutter create . --platforms=ios
+      - name: Recuperer les dependances Pub
+        script: |
+          flutter pub get
+      - name: Compiler pour iOS
+        script: |
+          flutter build ios --no-codesign
+    artifacts:
+      - build/ios/iphoneos/*.app
