@@ -1,5 +1,5 @@
 name: remote_control
-description: Application iOS de controle a distance pour PC en local.
+description: Application Android de controle a distance pour PC en local.
 version: 1.0.0+1
 
 environment:
@@ -16,8 +16,6 @@ flutter:
   uses-material-design: true
 
 flutter_launcher_icons:
-  android: false
-  ios: true
+  android: "launcher_icon"
+  ios: false
   image_path: "assets/icon.png"
-  remove_alpha_ios: true
-
