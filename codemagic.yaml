@@ -18,6 +18,9 @@ workflows:
       - name: Recuperer les dependances Pub
         script: |
           flutter pub get
+      - name: Generer les icone de l application
+        script: |
+          dart run flutter_launcher_icons
       - name: Compiler pour iOS
         script: |
           flutter build ios --no-codesign
