@@ -269,8 +269,8 @@ pause''';
                     ),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      width: 150,
-                      height: 150,
+                      width: 110,
+                      height: 110,
                       decoration: BoxDecoration(
                         color: _isConnected ? const Color(0xFF000000) : const Color(0xFFFF0000),
                         shape: BoxShape.circle,
@@ -283,7 +283,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 60,
+                          size: 110,
                         ),
                       ),
                     ),
