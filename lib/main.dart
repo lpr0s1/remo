@@ -201,13 +201,13 @@ pause''';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("[*] BX Remote [*]", style: TextStyle(fontSize: 14, letterSpacing: 1)),
+        title: const Text("[*] BX Remote [*] v0.1", style: TextStyle(fontSize: 18, letterSpacing: 1)),
         backgroundColor: const Color(0xFF000000),
         elevation: 0,
         actions: [
           TextButton(
             onPressed: _copyBatScript,
-            child: const Text("copier .bat", style: TextStyle(color: Color(0xFFFF0000), fontSize: 12)),
+            child: const Text("copier le .bat", style: TextStyle(color: Color(0xFFFF0000), fontSize: 13)),
           )
         ],
       ),
@@ -230,7 +230,7 @@ pause''';
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
-                    decoration: _customInputStyle("Port disponible"),
+                    decoration: _customInputStyle("Port"),
                   ),
                 ),
               ],
@@ -269,8 +269,8 @@ pause''';
                     ),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      width: 100,
-                      height: 100,
+                      width: 170,
+                      height: 170,
                       decoration: BoxDecoration(
                         color: _isConnected ? const Color(0xFF000000) : const Color(0xFFFF0000),
                         shape: BoxShape.circle,
@@ -281,7 +281,7 @@ pause''';
                       ),
                       child: Center(
                         child: Icon(
-                          _isConnected ? Icons.close : Icons.play_arrow,
+                          _isConnected ? Icons.close : Icons.radar,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
                           size: 28,
                         ),
@@ -293,7 +293,7 @@ pause''';
             ),
             const SizedBox(height: 12),
             Text(
-              _isConnected ? "status : Connecter" : "statut : Deconnecter",
+              _isConnected ? "status : [connecté]" : "statut : [deconnecté]",
               style: TextStyle(
                 fontSize: 15,
                 color: _isConnected ? const Color(0xFFFF0000) : Colors.white24,
