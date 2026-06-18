@@ -330,7 +330,7 @@ pause''';
             
             Row(
               children: [
-                const Text("logs", style: TextStyle(color: Colors.white22, fontSize: 13)),
+                const Text("logs", style: TextStyle(color: Colors.white24, fontSize: 13)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => setState(() => _showLogs = !_showLogs),
