@@ -93,9 +93,66 @@ pause''';
     });
   }
 
-  void _copyBatScript() {
-    Clipboard.setData(ClipboardData(text: _batScriptContent));
-    _addLog("script .bat copié.");
+  // Nouvelle méthode pour afficher le Popup d'édition et de copie
+  void _showBatScriptDialog() {
+    final TextEditingController dialogTextController = TextEditingController(text: _batScriptContent);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0A0A0A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: const BorderSide(color: Color(0xFFFF0000), width: 1.5),
+          ),
+          title: const Text(
+            "script de configuration .bat",
+            style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: "monospace"),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: TextField(
+              controller: dialogTextController,
+              maxLines: 15,
+              style: const TextStyle(color: Colors.white70, fontFamily: "monospace", fontSize: 11),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFF000000),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  borderSide: const BorderSide(color: Colors.white10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  borderSide: const BorderSide(color: Color(0xFFFF0000)),
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("annuler", style: TextStyle(color: Colors.white24, fontSize: 13)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF0000),
+                foregroundColor: Colors.black,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: dialogTextController.text));
+                Navigator.pop(context);
+                _addLog("script .bat personnalisé copié.");
+              },
+              child: const Text("copier", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _toggleConnection() async {
@@ -206,7 +263,7 @@ pause''';
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: _copyBatScript,
+            onPressed: _showBatScriptDialog, // Appelle le nouveau popup ici
             child: const Text("copier le .bat", style: TextStyle(color: Color(0xFFFF0000), fontSize: 13)),
           )
         ],
@@ -283,7 +340,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 110,
+                          size: 40, // Légère correction de la taille pour s'aligner dans la zone circulaire
                         ),
                       ),
                     ),
