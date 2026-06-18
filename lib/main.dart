@@ -106,7 +106,7 @@ pause''';
     }
   }
 
-  // Ouvre la fenêtre d'aide à la connexion
+
   void _navigateToHelp() {
     Navigator.push(
       context,
@@ -255,7 +255,7 @@ pause''';
               ],
             ),
             
-            // Bouton "Comment se connecter ?" aligné sous l'input IP
+       
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
@@ -325,7 +325,7 @@ pause''';
             ),
             const SizedBox(height: 12),
             Text(
-              _isConnected ? "status : connecté $ip:$port" : "statut : deconnecté",
+              _isConnected ? "status : connecté" : "statut : deconnecté",
               style: TextStyle(
                 fontSize: 15,
                 color: _isConnected ? const Color(0xFFFF0000) : Colors.white24,
