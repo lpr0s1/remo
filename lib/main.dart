@@ -283,7 +283,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 28,
+                          size: 40,
                         ),
                       ),
                     ),
