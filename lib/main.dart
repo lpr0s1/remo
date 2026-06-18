@@ -335,7 +335,7 @@ pause''';
                 GestureDetector(
                   onTap: () => setState(() => _showLogs = !_showLogs),
                   child: Text(
-                    _showLogs ? "masquer" : "afficher",
+                    _showLogs ? "< masquer" : "> afficher",
                     style: const TextStyle(color: Color(0xFFFF0000), fontSize: 11),
                   ),
                 ),
