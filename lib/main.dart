@@ -106,6 +106,16 @@ pause''';
     }
   }
 
+  // Ouvre la fenêtre d'aide à la connexion
+  void _navigateToHelp() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ConnectionHelpScreen(),
+      ),
+    );
+  }
+
   void _toggleConnection() async {
     if (_isConnected) {
       _disconnect();
@@ -190,7 +200,7 @@ pause''';
   InputDecoration _customInputStyle(String label) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white24, fontSize: 12),
+      labelStyle: const TextStyle(color: Colors.white24, fontSize: 13),
       filled: true,
       fillColor: const Color(0xFF0A0A0A),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -239,12 +249,26 @@ pause''';
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                     decoration: _customInputStyle("Port"),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+            
+            // Bouton "Comment se connecter ?" aligné sous l'input IP
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: _navigateToHelp,
+                icon: const Icon(Icons.help_outline, color: Color(0xFFFF0000), size: 15),
+                label: const Text(
+                  "comment se connecter ?",
+                  style: TextStyle(color: Color(0xFFFF0000), fontSize: 12, decoration: TextDecoration.underline),
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
 
             GestureDetector(
               onTapDown: (_) => _animationController.forward(),
@@ -292,7 +316,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 105,
+                          size: 40,
                         ),
                       ),
                     ),
@@ -308,7 +332,7 @@ pause''';
                 color: _isConnected ? const Color(0xFFFF0000) : Colors.white24,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 35),
 
             Row(
               children: [
@@ -472,6 +496,179 @@ class _BatScriptScreenState extends State<BatScriptScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ==========================================
+// NOUVELLE FENÊTRE : GUIDE DE CONNEXION MULTI-OS
+// ==========================================
+class ConnectionHelpScreen extends StatelessWidget {
+  const ConnectionHelpScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF000000),
+        appBar: AppBar(
+          title: const Text("guide de connexion", style: TextStyle(fontSize: 15, fontFamily: "monospace")),
+          backgroundColor: const Color(0xFF000000),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFFFF0000)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          bottom: const TabBar(
+            indicatorColor: Color(0xFFFF0000),
+            labelColor: Color(0xFFFF0000),
+            unselectedLabelColor: Colors.white30,
+            indicatorWeight: 2,
+            tabs: [
+              Tab(text: "windows"),
+              Tab(text: "macos"),
+              Tab(text: "android"),
+            ],
+          ),
+        ),
+        body: const TabBarView(
+          children: [
+            WindowsHelpView(),
+            MacHelpView(),
+            AndroidHelpView(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Composant réutilisable pour afficher chaque étape (Toggle masqué par défaut)
+class HelpStepToggle extends StatelessWidget {
+  final String title;
+  final String content;
+
+  const HelpStepToggle({super.key, required this.title, required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF050505),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          iconColor: const Color(0xFFFF0000),
+          collapsedIconColor: Colors.white38,
+          title: Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  content,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4, fontFamily: "monospace"),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Vue d'aide : Windows
+class WindowsHelpView extends StatelessWidget {
+  const WindowsHelpView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        HelpStepToggle(
+          title: "etape 1 : creer un dossier securise",
+          content: "Pour éviter que Windows Defender ou votre pare-feu bloque l'application, évitez le dossier /Downloads.\n\nCréez un dossier neuf à la racine de votre système, par exemple : C:\\BXRemote.",
+        ),
+        HelpStepToggle(
+          title: "etape 2 : autorisations du dossier",
+          content: "Faites un clic droit sur votre dossier créé -> Propriétés -> Sécurité.\n\nVérifiez que votre session utilisateur possède le contrôle total sur ce dossier afin d'exécuter des fichiers sans contraintes.",
+        ),
+        HelpStepToggle(
+          title: "etape 3 : deploiement du script .bat",
+          content: "1. Copiez le script .bat depuis l'application.\n2. Dans votre dossier sécurisé, créez un document texte nommé 'serveur.bat'.\n3. Collez le code dedans et sauvegardez.\n4. Double-cliquez pour exécuter l'écouteur sur le port 55555.",
+        ),
+        HelpStepToggle(
+          title: "etape 4 : recuperer l adresse ip locale",
+          content: "Ouvrez l'invite de commande (cmd) sur votre PC, tapez 'ipconfig' et repérez la ligne 'Adresse IPv4' (ex: 192.168.1.35).\n\nEntrez cette IP et le port 55555 dans l'application pour initier la liaison.",
+        ),
+      ],
+    );
+  }
+}
+
+// Vue d'aide : macOS
+class MacHelpView extends StatelessWidget {
+  const MacHelpView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        HelpStepToggle(
+          title: "etape 1 : configurer un repertoire isole",
+          content: "macOS restreint l'activité réseau brute dans le dossier Téléchargements standard.\n\nOuvrez votre Finder et créez un dossier isolé dans votre dossier utilisateur (ex: /Utilisateurs/votre-nom/BXConsole).",
+        ),
+        HelpStepToggle(
+          title: "etape 2 : demarrer l ecoute reseau",
+          content: "Ouvrez l'application Terminal sur votre Mac et déplacez-vous dans votre dossier sécurisé.\n\nTapez la commande de socket suivante pour ouvrir le port d'écoute :\nnc -l 55555",
+        ),
+        HelpStepToggle(
+          title: "etape 3 : autoriser les flux entrants",
+          content: "Si le système d'exploitation macOS affiche une alerte de sécurité, acceptez explicitement la demande d'autorisation réseau pour le Terminal.",
+        ),
+        HelpStepToggle(
+          title: "etape 4 : renseigner l ip locale",
+          content: "Allez dans Réglages Système -> Réseau -> Wi-Fi ou Ethernet -> Détails.\n\nNotez l'adresse IP locale affichée, renseignez-la dans BX Remote, puis validez.",
+        ),
+      ],
+    );
+  }
+}
+
+// Vue d'aide : Android
+class AndroidHelpView extends StatelessWidget {
+  const AndroidHelpView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        HelpStepToggle(
+          title: "etape 1 : installer un emulateur terminal",
+          content: "Pour que votre appareil Android puisse recevoir des commandes en local, téléchargez un émulateur de console réseau (ex: Termux) depuis une bibliothèque sécurisée.",
+        ),
+        HelpStepToggle(
+          title: "etape 2 : initialiser l ecoute locale",
+          content: "Ouvrez votre application de terminal Android (Termux) puis saisissez l'instruction suivante pour ouvrir le canal réseau interne :\nnc -l -p 55555",
+        ),
+        HelpStepToggle(
+          title: "etape 3 : verifier l ip reseau de l appareil",
+          content: "Allez dans Paramètres Android -> À propos du téléphone -> Statut (ou Infos d'état) -> Adresse IP.\n\nTant que l'appareil reste connecté au même réseau Wi-Fi local que votre iPhone, la liaison s'effectuera directement via cette IP.",
+        ),
+      ],
     );
   }
 }
