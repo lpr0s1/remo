@@ -106,7 +106,6 @@ pause''';
     }
   }
 
-
   void _navigateToHelp() {
     Navigator.push(
       context,
@@ -197,10 +196,11 @@ pause''';
     }
   }
 
-  InputDecoration _customInputStyle(String label) {
+  // Fonction mise à jour prenant la taille optionnelle en second paramètre
+  InputDecoration _customInputStyle(String label, [double fontSize = 13]) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white24, fontSize: 13),
+      labelStyle: TextStyle(color: Colors.white24, fontSize: fontSize),
       filled: true,
       fillColor: const Color(0xFF0A0A0A),
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -239,7 +239,8 @@ pause''';
                   flex: 3,
                   child: TextField(
                     controller: _ipController,
-                    decoration: _customInputStyle("Adresse IP cible"),
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                    decoration: _customInputStyle("Adresse IP cible", 16),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -249,13 +250,12 @@ pause''';
                     controller: _portController,
                     keyboardType: TextInputType.number,
                     style: const TextStyle(fontSize: 16, color: Colors.white),
-                    decoration: _customInputStyle("Port"),
+                    decoration: _customInputStyle("Port", 16),
                   ),
                 ),
               ],
             ),
             
-       
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
@@ -315,7 +315,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 105,
+                          size: 40,
                         ),
                       ),
                     ),
@@ -338,6 +338,7 @@ pause''';
                 Expanded(
                   child: TextField(
                     controller: _commandController,
+                    style: const TextStyle(fontSize: 14, color: Colors.white),
                     decoration: _customInputStyle("commandes a distance"),
                     onSubmitted: (_) => _handleCommandExecution(),
                   ),
@@ -611,7 +612,6 @@ class WindowsHelpView extends StatelessWidget {
   }
 }
 
-
 class MacHelpView extends StatelessWidget {
   const MacHelpView({super.key});
 
@@ -659,7 +659,7 @@ class AndroidHelpView extends StatelessWidget {
         ),
         HelpStepToggle(
           title: "etape 3 : verifier l ip reseau de l appareil",
-          content: "Allez dans Paramètres Android -> À propos du téléphone -> Statut (ou Infos d'état) -> Adresse IP.\n\nTant que l'appareil reste connecté au même réseau Wi-Fi local que votre iPhone, la liaison s'effectuera directement via cette IP.",
+          content: "Allez dans Paramètres Android -> À propos du téléphone -> Statut (ou Infos d'état) -> Adresse IP.\n\nTant que l'appareil reste connecté au même réseau Wi-Fi local que cet appareil Android, la liaison s'effectuera directement via cette IP.",
         ),
       ],
     );
