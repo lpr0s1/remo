@@ -239,7 +239,6 @@ pause''';
                   flex: 3,
                   child: TextField(
                     controller: _ipController,
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
                     decoration: _customInputStyle("Adresse IP cible"),
                   ),
                 ),
@@ -316,7 +315,7 @@ pause''';
                         child: Icon(
                           _isConnected ? Icons.close : Icons.sensors,
                           color: _isConnected ? const Color(0xFFFF0000) : Colors.black,
-                          size: 40,
+                          size: 105,
                         ),
                       ),
                     ),
@@ -442,7 +441,7 @@ class _BatScriptScreenState extends State<BatScriptScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF000000),
       appBar: AppBar(
-        title: const Text("configuration script .bat", style: TextStyle(fontSize: 14, fontFamily: "monospace")),
+        title: const Text("configuration server .bat", style: TextStyle(fontSize: 14, fontFamily: "monospace")),
         backgroundColor: const Color(0xFF000000),
         elevation: 0,
         leading: IconButton(
@@ -500,9 +499,6 @@ class _BatScriptScreenState extends State<BatScriptScreen> {
   }
 }
 
-// ==========================================
-// NOUVELLE FENÊTRE : GUIDE DE CONNEXION MULTI-OS
-// ==========================================
 class ConnectionHelpScreen extends StatelessWidget {
   const ConnectionHelpScreen({super.key});
 
@@ -544,7 +540,6 @@ class ConnectionHelpScreen extends StatelessWidget {
   }
 }
 
-// Composant réutilisable pour afficher chaque étape (Toggle masqué par défaut)
 class HelpStepToggle extends StatelessWidget {
   final String title;
   final String content;
@@ -587,7 +582,6 @@ class HelpStepToggle extends StatelessWidget {
   }
 }
 
-// Vue d'aide : Windows
 class WindowsHelpView extends StatelessWidget {
   const WindowsHelpView({super.key});
 
@@ -617,7 +611,7 @@ class WindowsHelpView extends StatelessWidget {
   }
 }
 
-// Vue d'aide : macOS
+
 class MacHelpView extends StatelessWidget {
   const MacHelpView({super.key});
 
@@ -647,7 +641,6 @@ class MacHelpView extends StatelessWidget {
   }
 }
 
-// Vue d'aide : Android
 class AndroidHelpView extends StatelessWidget {
   const AndroidHelpView({super.key});
 
