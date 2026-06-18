@@ -325,7 +325,7 @@ pause''';
             ),
             const SizedBox(height: 12),
             Text(
-              _isConnected ? "status : connecté" : "statut : deconnecté",
+              _isConnected ? "status : connecté $ip:$port" : "statut : deconnecté",
               style: TextStyle(
                 fontSize: 15,
                 color: _isConnected ? const Color(0xFFFF0000) : Colors.white24,
