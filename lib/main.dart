@@ -230,7 +230,7 @@ pause''';
                   child: TextField(
                     controller: _portController,
                     keyboardType: TextInputType.number,
-                    decoration: _customInputStyle("Port cible"),
+                    decoration: _customInputStyle("Port disponible"),
                   ),
                 ),
               ],
